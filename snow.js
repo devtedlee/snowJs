@@ -1,6 +1,7 @@
 let snowRootElement = document.getElementById('snow-root');
 const settings = {
   totalCount: 200,
+  paintDelay: 500,
 };
 
 function init() {
@@ -20,23 +21,26 @@ function init() {
     const randomX = getRandom(0, 1000000) * 0.0001,
       randomO = getRandom(-100000, 100000) * 0.0001,
       randomT = (getRandom(3, 8) * 10).toFixed(2),
-      randomS = (getRandom(0, 10000) * 0.0001).toFixed(2);
-    initCss += `.snow-item:nth-child(${i}){opacity:${(
-      getRandom(1, 10000) * 0.0001
-    ).toFixed(2)};transform:translate(${randomX.toFixed(
-      2
-    )}vw,-10px) scale(${randomS});animation:fall-${i} ${getRandom(
-      10,
-      30
-    )}s -${getRandom(
-      0,
-      30
-    )}s linear infinite}@keyframes fall-${i}{${randomT}%{transform:translate(${(
-      randomX + randomO
-    ).toFixed(2)}vw,${randomT}vh) scale(${randomS})}to{transform:translate(${(
-      randomX +
-      randomO / 2
-    ).toFixed(2)}vw, 105vh) scale(${randomS})}}`;
+      randomS = (getRandom(0, 10000) * 0.0001).toFixed(2),
+      randomOpacity = (getRandom(1, 10000) * 0.0001).toFixed(2);
+    initCss += `.snow-item:nth-child(${i}) {
+      opacity: ${randomOpacity};
+      transform: translate(${randomX.toFixed(2)}vw,-10px) scale(${randomS});
+      animation: fall-${i} ${getRandom(10, 30)}s -${getRandom(0, 30)}s linear infinite;
+    }
+    @keyframes fall-${i} {
+      0% {
+        opacity: 0;
+      }
+      ${randomT}% {
+        transform:translate(${(randomX + randomO).toFixed(2)}vw, ${randomT}vh) scale(${randomS});
+        opacity: 0.${randomT};
+      }
+      to {
+        transform:translate(${(randomX + randomO / 2).toFixed(2)}vw, 105vh) scale(${randomS});
+        opacity: ${randomOpacity};
+      }
+    }`;
   }
 
   snowRootElement.innerHTML = `
@@ -60,11 +64,11 @@ function init() {
             border-radius: 50%;
             margin-top:-10px;
         }
-        .snow-item.show {
-            visibility: visible;
-        }
         .snow-item.hide {
-            visibility: hidden;
+          visibility: hidden;
+        }
+        .snow-item.show {
+          visibility: visible;
         }
         ${initCss}
     </style>
@@ -74,9 +78,7 @@ function init() {
 }
 
 const paintSnow = debounce(() => {
-  const snowCount = Math.round(
-    settings.totalCount * (document.documentElement.clientWidth / 2560)
-  );
+  const snowCount = Math.round(settings.totalCount * (document.documentElement.clientWidth / 2560));
   const showSnows = snowRootElement.querySelectorAll('.snow-item.show');
   const hideSnows = snowRootElement.querySelectorAll('.snow-item.hide');
   const updateCount = showSnows.length - snowCount;
@@ -91,7 +93,7 @@ const paintSnow = debounce(() => {
       showSnows[i].classList.add('hide');
     }
   }
-}, 500);
+}, settings.paintDelay);
 
 function getRandom(a, b) {
   return Math.floor(Math.random() * (b - a + 1)) + a;
