@@ -1,22 +1,25 @@
-let snowRootElement = document.getElementById('snow-root');
-const settings = {
+// settings for snow
+const _settings = {
   totalCount: 200,
   paintDelay: 500,
 };
 
+/**
+ * init snow elements
+ */
 function init() {
-  if (snowRootElement) {
-    snowRootElement = document.getElementById('snow-root');
+  if (_snowRootElement) {
+    _snowRootElement = document.getElementById('snow-root');
   } else {
-    snowRootElement = document.createElement('div');
-    snowRootElement.id = 'snow-root';
-    document.body.appendChild(snowRootElement);
+    _snowRootElement = document.createElement('div');
+    _snowRootElement.id = 'snow-root';
+    document.body.appendChild(_snowRootElement);
   }
 
   let initHtml = '';
   let initCss = '';
 
-  for (let i = 1; i < settings.totalCount; ++i) {
+  for (let i = 1; i < _settings.totalCount; ++i) {
     initHtml += '<i class="snow-item show"></i>';
     const randomX = getRandom(0, 1000000) * 0.0001,
       randomO = getRandom(-100000, 100000) * 0.0001,
@@ -43,47 +46,51 @@ function init() {
     }`;
   }
 
-  snowRootElement.innerHTML = `
+  _snowRootElement.innerHTML = `
     <style>
-        #snow-root {
-            position:fixed;
-            left:0;
-            top:0;
-            bottom:0;
-            width:100vw;
-            height:100vh;
-            overflow:hidden;
-            z-index:9999999;
-            pointer-events:none
-        }
-        .snow-item {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: white;
-            border-radius: 50%;
-            margin-top:-10px;
-        }
-        .snow-item.hide {
-          visibility: hidden;
-        }
-        .snow-item.show {
-          visibility: visible;
-        }
-        ${initCss}
+      #snow-root {
+        position:fixed;
+        left:0;
+        top:0;
+        bottom:0;
+        width:100vw;
+        height:100vh;
+        overflow:hidden;
+        z-index:9999999;
+        pointer-events:none
+      }
+      .snow-item {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: white;
+        border-radius: 50%;
+        margin-top:-10px;
+      }
+      .snow-item.hide {
+        visibility: hidden;
+      }
+      .snow-item.show {
+        visibility: visible;
+      }
+      ${initCss}
     </style>
     ${initHtml}`;
 
   paintSnow();
 }
 
+/**
+ * paintSnow
+ * painting snows not layout
+ * debounce applied
+ */
 const paintSnow = debounce(() => {
-  const snowCount = Math.round(settings.totalCount * (document.documentElement.clientWidth / 2560));
-  const showSnows = snowRootElement.querySelectorAll('.snow-item.show');
-  const hideSnows = snowRootElement.querySelectorAll('.snow-item.hide');
-  const updateCount = showSnows.length - snowCount;
+  const snowCount = Math.round(_settings.totalCount * (document.documentElement.clientWidth / 2560));
+  const showSnows = _snowRootElement.querySelectorAll('.snow-item.show');
+  const hideSnows = _snowRootElement.querySelectorAll('.snow-item.hide');
 
-  const count = Math.abs(updateCount);
+  const count = Math.abs(showSnows.length - snowCount);
   for (let i = 0; i < count; ++i) {
     if (updateCount < 0) {
       hideSnows[i].classList.remove('hide');
@@ -93,12 +100,25 @@ const paintSnow = debounce(() => {
       showSnows[i].classList.add('hide');
     }
   }
-}, settings.paintDelay);
+}, _settings.paintDelay);
 
-function getRandom(a, b) {
-  return Math.floor(Math.random() * (b - a + 1)) + a;
+/**
+ * getRandom
+ * get random number
+ * @param {*} min min
+ * @param {*} max max
+ * @returns number
+ */
+function getRandom(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+/**
+ * debounce
+ * @param {*} cb debounced callback
+ * @param {*} delay delay milliseconds
+ * @returns callback result
+ */
 function debounce(cb, delay = 250) {
   let timeout;
 
@@ -110,7 +130,10 @@ function debounce(cb, delay = 250) {
   };
 }
 
-if (!snowRootElement) {
+let _snowRootElement = document.getElementById('snow-root');
+
+// init snow and event
+if (!_snowRootElement) {
   init();
 
   addEventListener('resize', () => {
