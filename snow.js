@@ -1,7 +1,8 @@
 // settings for snow
 const _settings = {
-  totalCount: 200,
-  paintDelay: 500,
+  maxSnowCount: 200, // max snow count
+  paintDelay: 500, // paint delay for resize event
+  screenSize: 2560, // screen size denominator
 };
 
 /**
@@ -19,7 +20,7 @@ function init() {
   let initHtml = '';
   let initCss = '';
 
-  for (let i = 1; i < _settings.totalCount; ++i) {
+  for (let i = 1; i < _settings.maxSnowCount; ++i) {
     initHtml += '<i class="snow-item show"></i>';
     const randomX = getRandom(0, 1000000) * 0.0001,
       randomO = getRandom(-100000, 100000) * 0.0001,
@@ -36,11 +37,11 @@ function init() {
         opacity: 0;
       }
       ${randomT}% {
-        transform:translate(${(randomX + randomO).toFixed(2)}vw, ${randomT}vh) scale(${randomS});
+        transform: translate(${(randomX + randomO).toFixed(2)}vw, ${randomT}vh) scale(${randomS});
         opacity: 0.${randomT};
       }
       to {
-        transform:translate(${(randomX + randomO / 2).toFixed(2)}vw, 105vh) scale(${randomS});
+        transform: translate(${(randomX + randomO / 2).toFixed(2)}vw, 105vh) scale(${randomS});
         opacity: ${randomOpacity};
       }
     }`;
@@ -86,7 +87,7 @@ function init() {
  * debounce applied
  */
 const paintSnow = debounce(() => {
-  const snowCount = Math.round(_settings.totalCount * (document.documentElement.clientWidth / 2560));
+  const snowCount = Math.round(_settings.maxSnowCount * (document.documentElement.clientWidth / _settings.screenSize));
   const showSnows = _snowRootElement.querySelectorAll('.snow-item.show');
   const hideSnows = _snowRootElement.querySelectorAll('.snow-item.hide');
 
