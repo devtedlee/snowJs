@@ -20,7 +20,7 @@ function init() {
   let initHtml = '';
   let initCss = '';
 
-  for (let i = 1; i < _settings.maxSnowCount; ++i) {
+  for (let i = 1; i <= _settings.maxSnowCount; ++i) {
     initHtml += '<i class="snow-item show"></i>';
     const randomX = getRandom(0, 1000000) * 0.0001,
       randomO = getRandom(-100000, 100000) * 0.0001,
@@ -28,55 +28,55 @@ function init() {
       randomS = (getRandom(0, 10000) * 0.0001).toFixed(2),
       randomOpacity = (getRandom(1, 10000) * 0.0001).toFixed(2);
     initCss += `.snow-item:nth-child(${i}) {
-      opacity: ${randomOpacity};
-      transform: translate(${randomX.toFixed(2)}vw,-10px) scale(${randomS});
-      animation: fall-${i} ${getRandom(10, 30)}s -${getRandom(0, 30)}s linear infinite;
+    opacity: ${randomOpacity};
+    transform: translate(${randomX.toFixed(2)}vw,-10px) scale(${randomS});
+    animation: fall-${i} ${getRandom(10, 30)}s -${getRandom(0, 30)}s linear infinite;
+  }
+  @keyframes fall-${i} {
+    0% {
+      opacity: 0;
     }
-    @keyframes fall-${i} {
-      0% {
-        opacity: 0;
-      }
-      ${randomT}% {
-        transform: translate(${(randomX + randomO).toFixed(2)}vw, ${randomT}vh) scale(${randomS});
-        opacity: 0.${randomT};
-      }
-      to {
-        transform: translate(${(randomX + randomO / 2).toFixed(2)}vw, 105vh) scale(${randomS});
-        opacity: ${randomOpacity};
-      }
-    }`;
+    ${randomT}% {
+      transform: translate(${(randomX + randomO).toFixed(2)}vw, ${randomT}vh) scale(${randomS});
+      opacity: 0.${randomT};
+    }
+    to {
+      transform: translate(${(randomX + randomO / 2).toFixed(2)}vw, 105vh) scale(${randomS});
+      opacity: ${randomOpacity};
+    }
+  }`;
   }
 
   _snowRootElement.innerHTML = `
-    <style>
-      #snow-root {
-        position:fixed;
-        left:0;
-        top:0;
-        bottom:0;
-        width:100vw;
-        height:100vh;
-        overflow:hidden;
-        z-index:9999999;
-        pointer-events:none
-      }
-      .snow-item {
-        position: absolute;
-        width: 10px;
-        height: 10px;
-        background: white;
-        border-radius: 50%;
-        margin-top:-10px;
-      }
-      .snow-item.hide {
-        visibility: hidden;
-      }
-      .snow-item.show {
-        visibility: visible;
-      }
-      ${initCss}
-    </style>
-    ${initHtml}`;
+  <style>
+    #snow-root {
+      position:fixed;
+      left:0;
+      top:0;
+      bottom:0;
+      width:100vw;
+      height:100vh;
+      overflow:hidden;
+      z-index:9999999;
+      pointer-events:none
+    }
+    .snow-item {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: white;
+      border-radius: 50%;
+      margin-top:-10px;
+    }
+    .snow-item.hide {
+      visibility: hidden;
+    }
+    .snow-item.show {
+      visibility: visible;
+    }
+    ${initCss}
+  </style>
+  ${initHtml}`;
 
   paintSnow();
 }
@@ -87,11 +87,15 @@ function init() {
  * debounce applied
  */
 const paintSnow = debounce(() => {
-  const snowCount = Math.round(_settings.maxSnowCount * (document.documentElement.clientWidth / _settings.screenSize));
+  let snowCount = Math.round(_settings.maxSnowCount * (document.documentElement.clientWidth / _settings.screenSize));
+  if (snowCount > _settings.maxSnowCount) {
+    snowCount = _settings.maxSnowCount;
+  }
   const showSnows = _snowRootElement.querySelectorAll('.snow-item.show');
   const hideSnows = _snowRootElement.querySelectorAll('.snow-item.hide');
 
-  const count = Math.abs(showSnows.length - snowCount);
+  const updateCount = showSnows.length - snowCount;
+  const count = Math.abs(updateCount);
   for (let i = 0; i < count; ++i) {
     if (updateCount < 0) {
       hideSnows[i].classList.remove('hide');
